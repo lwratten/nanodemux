@@ -37,12 +37,13 @@ args = argParser.parse_args()
 
 ERROR_STR = 'ERROR: Please check samplesheet'
 HEADER = ['sample', 'fastq', 'barcode', 'genome']
+HEADER_TX = ['sample', 'fastq', 'barcode', 'genome', 'transcriptome']
 
 ## CHECK HEADER
 fin = open(args.DESIGN_FILE_IN,'r')
 header = fin.readline().strip().split(',')
-if header != HEADER:
-    print("{} header: {} != {}".format(ERROR_STR,','.join(header),','.join(HEADER)))
+if header != HEADER and header != HEADER_TX:
+    print("{} header: {} != {} or {}".format(ERROR_STR,','.join(header),','.join(HEADER),','.join(HEADER_TX)))
     sys.exit(1)
 
 outLines = []
@@ -50,7 +51,7 @@ while True:
     line = fin.readline()
     if line:
         lspl = [x.strip() for x in line.strip().split(',')]
-        sample,fastq,barcode,genome = lspl
+        sample,fastq,barcode,genome,txome = lspl
 
         ## CHECK VALID NUMBER OF COLUMNS PER SAMPLE
         numCols = len([x for x in lspl if x])
@@ -92,7 +93,27 @@ while True:
                     print("{}: Genome field incorrect extension (has to be '.fasta' or '.fa' or '.fasta.gz' or '.fa.gz')!\nLine: '{}'".format(ERROR_STR,line.strip()))
                     sys.exit(1)
 
-        outLines.append([sample,fastq,barcode,genome])
+        if txome:
+            ## CHECK TRANSCRIPTOME HAS NO SPACES
+            if txome.find(' ') != -1:
+                print("{}: Transcriptome field contains spaces!\nLine: '{}'".format(ERROR_STR,line.strip()))
+                sys.exit(1)
+
+            # CHECK TRANSCRIPTOME EXTENSION
+            if len(txome.split('.')) > 1:
+                if txome[-6:] != '.fasta' and txome[-3:] != '.fa' and txome[-9:] != '.fasta.gz' and txome[-6:] != '.fa.gz' and txome[-4:] != '.gtf' and txome[-7:] != '.gtf.gz':
+                    print("{}: Genome field incorrect extension (has to be '.fasta' or '.fa' or '.fasta.gz' or '.fa.gz' or '.gtf' or '.gtf.gz')!\nLine: '{}'".format(ERROR_STR,line.strip()))
+                    sys.exit(1)
+
+                # CHECK TRANSCRIPTOME DOES NOT INTERFERE WITH GENOME
+                if genome and (txome[-4:] != '.gtf' and txome[-7:] != '.gtf.gz'):
+                    print("{}: Genome and transcriptome cannot both be of type 'fasta'!\nLine: '{}'".format(ERROR_STR,line.strip()))
+                    sys.exit(1)
+                if not genome and (txome[-4:] == '.gtf' or txome[-7:] == '.gtf.gz'):
+                    print("{}: Genome or transcriptome must be of type 'fasta'!\nLine: '{}'".format(ERROR_STR,line.strip()))
+                    sys.exit(1)
+
+        outLines.append([sample,fastq,barcode,genome,txome])
     else:
         fin.close()
         break
