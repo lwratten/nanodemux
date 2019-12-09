@@ -51,8 +51,11 @@ while True:
     line = fin.readline()
     if line:
         lspl = [x.strip() for x in line.strip().split(',')]
-        txome = ''
-        (sample,fastq,barcode,genome = lspl) if (header == HEADER) else (sample,fastq,barcode,genome,txome = lspl)
+        if header == HEADER:
+            txome = ''
+            sample,fastq,barcode,genome = lspl
+        else:
+            sample,fastq,barcode,genome,txome = lspl
 
         ## CHECK VALID NUMBER OF COLUMNS PER SAMPLE
         numCols = len([x for x in lspl if x])
