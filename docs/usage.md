@@ -132,23 +132,23 @@ If `-profile` is not specified at all the pipeline will be run locally and expec
 
 ### `--input`
 
-You will need to create a file with information about the samples in your experiment/run before executing the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 4 columns, and a header row. As shown in the examples below, the accepted format of the file is slightly different if you would like to run the pipeline with or without demultiplexing.
+You will need to create a file with information about the samples in your experiment/run before executing the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 5 columns, and a header row. As shown in the examples below, the accepted format of the file is slightly different if you would like to run the pipeline with or without demultiplexing.
 
 #### With basecalling and demultiplexing
 
 ```bash
-sample,fastq,barcode,genome
-Sample1,,1,mm10
-Sample2,,2,mm10
-Sample3,,3,hg19
-Sample4,,4,/path/to/local/reference/genome.fa
+sample,fastq,barcode,genome,transcriptome
+Sample1,,1,mm10,
+Sample2,,2,mm10,
+Sample3,,3,hg19,
+Sample4,,4,/path/to/local/reference/genome.fa,
 ```
 
 #### With basecalling but not demultiplexing
 
 ```bash
-sample,fastq,barcode,genome
-Sample1,,1,mm10
+sample,fastq,barcode,genome,transcriptome
+Sample1,,1,mm10,
 ```
 
 > You will have to specify the `--skip_demultiplexing` parameter if you wish to bypass the demultiplexing step.
@@ -156,11 +156,11 @@ Sample1,,1,mm10
 #### Without both basecalling and demultiplexing
 
 ```bash
-sample,fastq,barcode,genome
-Sample1,SAM101A1.fastq.gz,,mm10
-Sample2,SAM101A2.fastq.gz,,mm10
-Sample3,SAM101A3.fastq.gz,,hg19
-Sample4,SAM101A4.fastq.gz,,/path/to/local/reference/genome.fa
+sample,fastq,barcode,genome,transcriptome
+Sample1,SAM101A1.fastq.gz,,mm10,
+Sample2,SAM101A2.fastq.gz,,mm10,
+Sample3,SAM101A3.fastq.gz,,hg19,
+Sample4,SAM101A4.fastq.gz,,/path/to/local/reference/genome.fa,
 
 > You will have to specify the `--skip_basecalling` parameter if you wish to bypass the basecalling and demultiplexing steps.
 
@@ -172,6 +172,7 @@ Sample4,SAM101A4.fastq.gz,,/path/to/local/reference/genome.fa
 | `fastq`  | Full path to FastQ file if previously demultiplexed. File has to be zipped and have the extension ".fastq.gz" or ".fq.gz". |
 | `barcode`| Barcode identifier attributed to that sample when multiplexing samples in integer format.                                  |
 | `genome` | Genome fasta for alignment. This can either be a local path, or the appropriate key for a genome available on [AWS-iGenomes](https://ewels.github.io/AWS-iGenomes/) (see [iGenomes config file](../conf/igenomes.config)). If unspecified then the alignment step will be skipped for that sample. |
+| `transcriptome` | Transcriptome fasta for transcriptome alignment or gtf annotation file for transcript aware genome alignment. This can either be a local path, or the appropriate key for a genome available on [AWS-iGenomes](https://ewels.github.io/AWS-iGenomes/) if using gtf (see [iGenomes config file](../conf/igenomes.config)).
 
 ### `--protocol`
 
